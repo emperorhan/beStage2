@@ -10,6 +10,8 @@
 #include <eosiolib/privileged.hpp>
 #include <eosiolib/singleton.hpp>
 #include <eosio.system/exchange_state.hpp>
+#include <map>
+#include <iostream>
 
 #include <string>
 
@@ -62,20 +64,33 @@ namespace eosiosystem {
    };
 
    struct producer_info {
-      account_name          owner;
-      int64_t               total_votes = 0;
-      eosio::public_key     producer_key; /// a packed public key object
-      bool                  is_active = true;
-      std::string           url;
-      uint32_t              unpaid_blocks = 0;
-      uint64_t              last_claim_time = 0;
-      uint16_t              location = 0;
+      account_name                  owner;
+      std::map<uint64_t, int64_t>   vote_weight_window;
+      int64_t                       total_votes = 0;
+      eosio::public_key             producer_key; /// a packed public key object
+      bool                          is_active = true;
+      std::string                   url;
+      uint32_t                      unpaid_blocks = 0;
+      uint64_t                      last_claim_time = 0;
+      uint16_t                      location = 0;
 
       uint64_t primary_key()const { return owner;                                   }
       double   by_votes()const    { return is_active ? -total_votes : total_votes;  }
       bool     active()const      { return is_active;                               }
       void     deactivate()       { producer_key = public_key(); is_active = false; }
+      void     set_vote_weight(int64_t vote)  {
+         std::pair<std::map<uint64_t, int64_t>::iterator, bool> ret;
+         uint64_t idx = ((now() - (block_timestamp::block_timestamp_epoch / 1000)) / 24 * 3600);
 
+         ret = vote_weight_window.insert({idx, vote});
+         if(ret.second == false) vote_weight_window.at(idx) += vote;
+         total_votes += vote;
+
+         if(vote_weight_window.size() == 31){
+            total_votes -= vote_weight_window.at(idx - 30);
+            vote_weight_window.erase(idx - 30);
+         }
+      }
       // explicit serialization macro is not necessary, used here only to improve compilation time
       EOSLIB_SERIALIZE( producer_info, (owner)(total_votes)(producer_key)(is_active)(url)
                         (unpaid_blocks)(last_claim_time)(location) )

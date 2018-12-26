@@ -324,7 +324,7 @@ namespace eosiosystem {
       return sign + result + " " + symbol_to_string(val);
    }
 
-   void system_contract::update_votes( const account_name burner, const account_name target_producer, asset quantity ) {
+   void system_contract::update_votes( const account_name burner, const std::vector<account_name>& producers, asset quantity ) {
       eosio_assert( is_account(burner), "burner account does not exist" );
       eosio_assert( quantity.is_valid(), "invalid quantity" );
       eosio_assert( quantity.symbol == symbol_type(system_token_symbol), "this token is not system token" );
