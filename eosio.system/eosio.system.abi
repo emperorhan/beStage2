@@ -476,10 +476,6 @@
       "type": "unregprod",
       "ricardian_contract": ""
    },{
-      "name": "regproxy",
-      "type": "regproxy",
-      "ricardian_contract": ""
-   },{
       "name": "voteproducer",
       "type": "voteproducer",
       "ricardian_contract": ""
