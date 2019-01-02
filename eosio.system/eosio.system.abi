@@ -300,7 +300,7 @@
       "fields": [
         {"name":"voter_name",       "type":"account_name"},
         {"name":"quantity",         "type":"asset"},
-        {"name":"producers",        "type":"account_name[]"},
+        {"name":"producers",        "type":"account_name[]"}
       ]
     },{
       "name": "voter_info",
