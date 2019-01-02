@@ -136,7 +136,7 @@ namespace eosiosystem {
       return sign + result + " " + symbol_to_string(val);
    }
 
-   void system_contract::voteproducer( const account_name voter_name, const asset quantity const std::vector<account_name>& producers ) {
+   void system_contract::voteproducer( const account_name voter_name, const asset quantity, const std::vector<account_name>& producers ) {
       require_auth( voter_name );
       update_votes( voter_name, quantity, producers );
    }
