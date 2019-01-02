@@ -163,7 +163,7 @@ namespace eosiosystem {
          if( pitr != _producers.end() ) {
             _producers.modify( pitr, 0, [&]( auto& p ) {
                eosio_assert( p->active(), "producer is not currently registered" );
-               p.set_vote_weight(vote_weight)
+               p.set_vote_weight(vote_weight);
                _gstate.total_producer_vote_weight += vote_weight;
             });
          }

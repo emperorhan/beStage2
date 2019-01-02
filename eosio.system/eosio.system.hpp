@@ -11,7 +11,7 @@
 #include <eosiolib/singleton.hpp>
 #include <eosio.system/exchange_state.hpp>
 #include <map>
-#include <iostream>
+// #include <iostream>
 
 #include <string>
 
