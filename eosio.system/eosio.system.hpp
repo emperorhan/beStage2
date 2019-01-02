@@ -222,7 +222,7 @@ namespace eosiosystem {
          // void voteproducer( const account_name voter_name, const account_name target_producer, asset quantity );
 
          //beStage 2
-         void voteproducer( const account_name voter_name, const std::vector<account_name>& producers, asset quantity );
+         void voteproducer( const account_name voter_name, const asset quantity, const std::vector<account_name>& producers );
 
          void regproxy( const account_name proxy, bool isproxy );
 
@@ -255,7 +255,9 @@ namespace eosiosystem {
 
          //beStage 1
          // void update_votes( const account_name burner, const account_name target_producer, asset quantity );
-         void update_votes( const account_name burner, const std::vector<account_name>& producers, asset quantity );
+
+         //beStage 2
+         void update_votes( const account_name burner, const asset quantity, const std::vector<account_name>& producers );
    };
 
 } /// eosiosystem

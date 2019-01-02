@@ -136,12 +136,12 @@ namespace eosiosystem {
       return sign + result + " " + symbol_to_string(val);
    }
 
-   void system_contract::voteproducer( const account_name voter_name, const std::vector<account_name>& producers, asset quantity ) {
+   void system_contract::voteproducer( const account_name voter_name, const asset quantity const std::vector<account_name>& producers ) {
       require_auth( voter_name );
-      update_votes( voter_name, producers, quantity );
+      update_votes( voter_name, quantity, producers );
    }
 
-   void system_contract::update_votes( const account_name burner, const std::vector<account_name>& producers, asset quantity ) {
+   void system_contract::update_votes( const account_name burner, const asset quantity, const std::vector<account_name>& producers ) {
       // producer votes must be unique and sorted
       // std::sort(producers.begin(), producers.end());
       // producers.erase(std::unique(producers.begin(), producers.end()), producers.end());

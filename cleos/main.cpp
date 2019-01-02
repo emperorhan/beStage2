@@ -1129,14 +1129,14 @@ struct unregister_producer_subcommand {
 //beStage 2
 struct vote_producers_subcommand {
    string voter_str;
-   vector<eosio::name> producer_names;
    string burn_quantity;
+   vector<eosio::name> producer_names;
 
    vote_producers_subcommand(CLI::App* actionRoot) {
       auto vote_producers = actionRoot->add_subcommand("voteproducer", localized("Vote for one or more producers"));
       vote_producers->add_option("voter_name", voter_str, localized("The voting account"))->required();
-      vote_producers->add_option("producers", producer_names, localized("The account(s) to vote for. All options from this position and following will be treated as the producer list."))->required();
       vote_producers->add_option("quantity", burn_quantity, localized("burn asset."))->required();
+      vote_producers->add_option("producers", producer_names, localized("The account(s) to vote for. All options from this position and following will be treated as the producer list."))->required();
       add_standard_transaction_options(vote_producers, "voter@active");
 
       vote_producers->set_callback([this] {
@@ -1145,8 +1145,8 @@ struct vote_producers_subcommand {
 
          fc::variant act_payload = fc::mutable_variant_object()
                   ("voter_name", voter_str)
-                  ("producers", producer_names);
                   ("quantity", to_asset(burn_quantity));
+                  ("producers", producer_names);
          auto accountPermissions = get_account_permissions(tx_permission, {voter_str,config::active_name});
          send_actions({create_action(accountPermissions, config::system_account_name, N(voteproducer), act_payload)});
       });
