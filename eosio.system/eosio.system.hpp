@@ -92,7 +92,7 @@ namespace eosiosystem {
          }
       }
       // explicit serialization macro is not necessary, used here only to improve compilation time
-      EOSLIB_SERIALIZE( producer_info, (owner)(total_votes)(producer_key)(is_active)(url)
+      EOSLIB_SERIALIZE( producer_info, (owner)(vote_weight_window)(total_votes)(producer_key)(is_active)(url)
                         (unpaid_blocks)(last_claim_time)(location) )
    };
 
