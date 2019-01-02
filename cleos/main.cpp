@@ -1101,23 +1101,51 @@ struct unregister_producer_subcommand {
 //    }
 // };
 
-struct vote_producer_subcommand {
-   eosio::name voter_str;
-   // vector<eosio::name> producer_names;
-   eosio::name target_producer_name;
+//beStage 1
+// struct vote_producer_subcommand {
+//    eosio::name voter_str;
+//    // vector<eosio::name> producer_names;
+//    eosio::name target_producer_name;
+//    string burn_quantity;
+
+//    vote_producer_subcommand(CLI::App* actionRoot) {
+//       auto vote_producer = actionRoot->add_subcommand("voteproducer", localized("Vote for one producer"));
+//       vote_producer->add_option("voter_name", voter_str, localized("The voting account"))->required();
+//       vote_producer->add_option("target_producer", target_producer_name, localized("The account(s) to vote for. All options from this position and following will be treated as the producer."))->required();
+//       vote_producer->add_option("quantity", burn_quantity, localized("burn asset."))->required();
+//       add_standard_transaction_options(vote_producer, "voter@active");
+
+//       vote_producer->set_callback([this] {
+//          fc::variant act_payload = fc::mutable_variant_object()
+//                   ("voter_name", voter_str)
+//                   ("target_producer", target_producer_name)
+//                   ("quantity", to_asset(burn_quantity));
+//          auto accountPermissions = get_account_permissions(tx_permission, {voter_str,config::active_name});
+//          send_actions({create_action(accountPermissions, config::system_account_name, N(voteproducer), act_payload)});
+//       });
+//    }
+// };
+
+//beStage 2
+struct vote_producers_subcommand {
+   string voter_str;
+   vector<eosio::name> producer_names;
    string burn_quantity;
 
-   vote_producer_subcommand(CLI::App* actionRoot) {
-      auto vote_producer = actionRoot->add_subcommand("voteproducer", localized("Vote for one producer"));
-      vote_producer->add_option("voter_name", voter_str, localized("The voting account"))->required();
-      vote_producer->add_option("target_producer", target_producer_name, localized("The account(s) to vote for. All options from this position and following will be treated as the producer."))->required();
-      vote_producer->add_option("quantity", burn_quantity, localized("burn asset."))->required();
-      add_standard_transaction_options(vote_producer, "voter@active");
+   vote_producers_subcommand(CLI::App* actionRoot) {
+      auto vote_producers = actionRoot->add_subcommand("voteproducer", localized("Vote for one or more producers"));
+      vote_producers->add_option("voter_name", voter_str, localized("The voting account"))->required();
+      vote_producers->add_option("producers", producer_names, localized("The account(s) to vote for. All options from this position and following will be treated as the producer list."))->required();
+      vote_producers->add_option("quantity", burn_quantity, localized("burn asset."))->required();
+      add_standard_transaction_options(vote_producers, "voter@active");
 
-      vote_producer->set_callback([this] {
+      vote_producers->set_callback([this] {
+
+         std::sort( producer_names.begin(), producer_names.end() );
+
          fc::variant act_payload = fc::mutable_variant_object()
                   ("voter_name", voter_str)
-                  ("target_producer", target_producer_name)
+                  ("producers", producer_names);
                   ("quantity", to_asset(burn_quantity));
          auto accountPermissions = get_account_permissions(tx_permission, {voter_str,config::active_name});
          send_actions({create_action(accountPermissions, config::system_account_name, N(voteproducer), act_payload)});
