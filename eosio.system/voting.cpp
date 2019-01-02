@@ -102,6 +102,74 @@ namespace eosiosystem {
       }
    }
 
+   std::string symbol_to_string(const asset val) {
+      uint64_t v = val.symbol.value;
+      v >>= 8;
+      string result;
+      while (v > 0) {
+               char c = static_cast<char>(v & 0xFF);
+               result += c;
+               v >>= 8;
+      }
+      return result;
+   }
+
+   std::string asset_to_string(const asset val) {
+      string sign = val.amount < 0 ? "-" : "";
+      uint64_t abs_amount = static_cast<uint64_t>(std::abs(val.amount));
+      auto precision = val.symbol.precision();
+
+      string result = std::to_string( abs_amount);
+      if( precision > 0 )
+      {
+               auto p = precision;
+               uint64_t p10 = 1;
+               while(p > 0) {
+                     p10 *= 10;
+                     p--;
+               }
+
+               result = std::to_string( static_cast<uint64_t>(abs_amount / p10));
+               auto fract = abs_amount % p10;
+               result += "." + std::to_string(p10 + fract).erase(0,1);
+      }
+      return sign + result + " " + symbol_to_string(val);
+   }
+
+   void system_contract::voteproducer( const account_name voter_name, const std::vector<account_name>& producers, asset quantity ) {
+      require_auth( voter_name );
+      update_votes( voter_name, producers, quantity );
+   }
+
+   void system_contract::update_votes( const account_name burner, const std::vector<account_name>& producers, asset quantity ) {
+      // producer votes must be unique and sorted
+      std::sort(producers.begin(), producers.end());
+      producers.erase(std::unique(producers.begin(), producers.end()), producers.end());
+      
+      eosio_assert( producers.size() <= 30, "attempt to vote for too many producers" );
+      eosio_assert( quantity.is_valid(), "invalid quantity" );
+      eosio_assert( quantity.symbol == symbol_type(system_token_symbol), "this token is not system token" );
+      eosio_assert( quantity.amount > 0, "must burn positive quantity" );
+
+      int64_t vote_weight = quantity.amount;
+
+      auto burner_name = name{burner};
+      std::string quantity_string = asset_to_string(quantity);
+      INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {burner, N(active)}, 
+      { burner, N(eosio.burn), quantity, std::string(burner_name.to_string() + " transfer " + quantity_string + " for burn") } );
+
+      for( const auto& pn : producers ) {
+         auto pitr = _producers.find( pn );
+         if( pitr != _producers.end() ) {
+            _producers.modify( pitr, 0, [&]( auto& p ) {
+               eosio_assert( p->active(), "producer is not currently registered" );
+               p.set_vote_weight(vote_weight)
+               _gstate.total_producer_vote_weight += vote_weight;
+            });
+         }
+      }
+   }
+
    // double stake2vote( int64_t staked ) {
    //    /// TODO subtract 2080 brings the large numbers closer to this decade
    //    double weight = int64_t( (now() - (block_timestamp::block_timestamp_epoch / 1000)) / (seconds_per_day * 7) )  / double( 52 );
@@ -285,65 +353,31 @@ namespace eosiosystem {
    //    );
    // }
 
-   void system_contract::voteproducer( const account_name voter_name, const account_name target_producer, asset quantity ) {
-      require_auth( voter_name );
-      update_votes( voter_name, target_producer, quantity );
-   }
+   // void system_contract::voteproducer( const account_name voter_name, const account_name target_producer, asset quantity ) {
+   //    require_auth( voter_name );
+   //    update_votes( voter_name, target_producer, quantity );
+   // }
 
-   std::string symbol_to_string(const asset val) {
-      uint64_t v = val.symbol.value;
-      v >>= 8;
-      string result;
-      while (v > 0) {
-               char c = static_cast<char>(v & 0xFF);
-               result += c;
-               v >>= 8;
-      }
-      return result;
-   }
+   // void system_contract::update_votes( const account_name burner, const std::vector<account_name>& producers, asset quantity ) {
+   //    eosio_assert( is_account(burner), "burner account does not exist" );
+   //    eosio_assert( quantity.is_valid(), "invalid quantity" );
+   //    eosio_assert( quantity.symbol == symbol_type(system_token_symbol), "this token is not system token" );
+   //    eosio_assert( quantity.amount > 0, "must burn positive quantity" );
+   //    auto target = _producers.find(target_producer);
+   //    eosio_assert( target != _producers.end(), "target producer does not exist" );
+   //    eosio_assert( target->active(), "producer is not currently registered" );
 
-   std::string asset_to_string(const asset val) {
-      string sign = val.amount < 0 ? "-" : "";
-      uint64_t abs_amount = static_cast<uint64_t>(std::abs(val.amount));
-      auto precision = val.symbol.precision();
+   //    int64_t vote_weight = quantity.amount;
 
-      string result = std::to_string( abs_amount);
-      if( precision > 0 )
-      {
-               auto p = precision;
-               uint64_t p10 = 1;
-               while(p > 0) {
-                     p10 *= 10;
-                     p--;
-               }
+   //    auto burner_name = name{burner};
+   //    std::string quantity_string = asset_to_string(quantity);
+   //    INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {burner, N(active)}, 
+   //    { burner, N(eosio.burn), quantity, std::string(burner_name.to_string() + " transfer " + quantity_string + " for burn") } );
 
-               result = std::to_string( static_cast<uint64_t>(abs_amount / p10));
-               auto fract = abs_amount % p10;
-               result += "." + std::to_string(p10 + fract).erase(0,1);
-      }
-      return sign + result + " " + symbol_to_string(val);
-   }
-
-   void system_contract::update_votes( const account_name burner, const std::vector<account_name>& producers, asset quantity ) {
-      eosio_assert( is_account(burner), "burner account does not exist" );
-      eosio_assert( quantity.is_valid(), "invalid quantity" );
-      eosio_assert( quantity.symbol == symbol_type(system_token_symbol), "this token is not system token" );
-      eosio_assert( quantity.amount > 0, "must burn positive quantity" );
-      auto target = _producers.find(target_producer);
-      eosio_assert( target != _producers.end(), "target producer does not exist" );
-      eosio_assert( target->active(), "producer is not currently registered" );
-
-      int64_t vote_weight = quantity.amount;
-
-      auto burner_name = name{burner};
-      std::string quantity_string = asset_to_string(quantity);
-      INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {burner, N(active)}, 
-      { burner, N(eosio.burn), quantity, std::string(burner_name.to_string() + " transfer " + quantity_string + " for burn") } );
-
-      _producers.modify(target, 0, [&](auto& p) {
-         p.total_votes += vote_weight;
-         _gstate.total_producer_vote_weight += vote_weight;
-      });
-   }
+   //    _producers.modify(target, 0, [&](auto& p) {
+   //       p.total_votes += vote_weight;
+   //       _gstate.total_producer_vote_weight += vote_weight;
+   //    });
+   // }
    
 } /// namespace eosiosystem
