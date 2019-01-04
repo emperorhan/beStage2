@@ -51,7 +51,7 @@ namespace eosiosystem {
       } else {
          _producers.emplace( producer, [&]( producer_info& info ){
                info.owner         = producer;
-               info.total_votes   = 0;
+               // info.total_votes   = 0;
                info.producer_key  = producer_key;
                info.is_active     = true;
                info.url           = url;
@@ -78,8 +78,8 @@ namespace eosiosystem {
       std::vector< std::pair<eosio::producer_key,uint16_t> > top_producers;
       top_producers.reserve(21);
 
-      // for ( auto it = idx.cbegin(); it != idx.cend() && top_producers.size() < 21 && 0 < it->get_vote_weight() && it->active(); ++it ) {
-      for ( auto it = idx.cbegin(); it != idx.cend() && top_producers.size() < 21 && 0 < it->total_votes && it->active(); ++it ) {
+      for ( auto it = idx.cbegin(); it != idx.cend() && top_producers.size() < 21 && 0 < it->get_vote_weight() && it->active(); ++it ) {
+      // for ( auto it = idx.cbegin(); it != idx.cend() && top_producers.size() < 21 && 0 < it->total_votes && it->active(); ++it ) {
          top_producers.emplace_back( std::pair<eosio::producer_key,uint16_t>({{it->owner, it->producer_key}, it->location}) );
       }
 
