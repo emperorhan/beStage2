@@ -137,26 +137,31 @@ namespace eosiosystem {
       return sign + result + " " + symbol_to_string(val);
    }
 
-   void system_contract::voteproducer( const account_name voter_name, const asset quantity, const std::vector<account_name>& producers ) {
+   // void system_contract::voteproducer( const account_name voter_name, const asset quantity, const std::vector<account_name>& producers ) {
+   //    require_auth( voter_name );
+   //    update_votes( voter_name, quantity, producers );
+   // }
+
+   void system_contract::voteproducer( const account_name voter_name, const std::vector<account_name>& producers ) {
       require_auth( voter_name );
-      update_votes( voter_name, quantity, producers );
+      update_votes( voter_name, producers );
    }
 
-   void system_contract::update_votes( const account_name burner, const asset quantity, const std::vector<account_name>& producers ) {
+   void system_contract::update_votes( const account_name burner, const std::vector<account_name>& producers ) {
       for( size_t i = 1; i < producers.size(); ++i ) {
          eosio_assert( producers[i-1] < producers[i], "producer votes must be unique and sorted" );
       }
       eosio_assert( producers.size() <= 30, "attempt to vote for too many producers" );
-      eosio_assert( quantity.is_valid(), "invalid quantity" );
-      eosio_assert( quantity.symbol == symbol_type(system_token_symbol), "this token is not system token" );
-      eosio_assert( quantity.amount > 0, "must burn positive quantity" );
+      // eosio_assert( quantity.is_valid(), "invalid quantity" );
+      // eosio_assert( quantity.symbol == symbol_type(system_token_symbol), "this token is not system token" );
+      // eosio_assert( quantity.amount > 0, "must burn positive quantity" );
 
-      int64_t vote_weight = quantity.amount;
-
+      // int64_t vote_weight = quantity.amount;
+      int64_t vote_weight = 10;
       auto burner_name = name{burner};
-      std::string quantity_string = asset_to_string(quantity);
-      INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {burner, N(active)}, 
-      { burner, N(eosio.burn), quantity, std::string(burner_name.to_string() + " transfer " + quantity_string + " for burn") } );
+      // std::string quantity_string = asset_to_string(quantity);
+      // INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {burner, N(active)}, 
+      // { burner, N(eosio.burn), quantity, std::string(burner_name.to_string() + " transfer " + quantity_string + " for burn") } );
 
       for( const auto& pn : producers ) {
          auto pitr = _producers.find( pn );
@@ -171,6 +176,36 @@ namespace eosiosystem {
          }
       }
    }
+
+   // void system_contract::update_votes( const account_name burner, const asset quantity, const std::vector<account_name>& producers ) {
+   //    for( size_t i = 1; i < producers.size(); ++i ) {
+   //       eosio_assert( producers[i-1] < producers[i], "producer votes must be unique and sorted" );
+   //    }
+   //    eosio_assert( producers.size() <= 30, "attempt to vote for too many producers" );
+   //    eosio_assert( quantity.is_valid(), "invalid quantity" );
+   //    eosio_assert( quantity.symbol == symbol_type(system_token_symbol), "this token is not system token" );
+   //    eosio_assert( quantity.amount > 0, "must burn positive quantity" );
+
+   //    int64_t vote_weight = quantity.amount;
+
+   //    auto burner_name = name{burner};
+   //    std::string quantity_string = asset_to_string(quantity);
+   //    INLINE_ACTION_SENDER(eosio::token, transfer)( N(eosio.token), {burner, N(active)}, 
+   //    { burner, N(eosio.burn), quantity, std::string(burner_name.to_string() + " transfer " + quantity_string + " for burn") } );
+
+   //    for( const auto& pn : producers ) {
+   //       auto pitr = _producers.find( pn );
+   //       if( pitr != _producers.end() ) {
+   //          _producers.modify( pitr, 0, [&]( auto& p ) {
+   //             eosio_assert( p.active(), "producer is not currently registered" );
+   //             // p.set_vote_weight(vote_weight);
+   //             p.total_votes += vote_weight;
+   //             // TODO: 30days가 지나면 _gstate의 total_producer_vote_weight도 감소시켜줘야함.
+   //             _gstate.total_producer_vote_weight += vote_weight;
+   //          });
+   //       }
+   //    }
+   // }
 
    // double stake2vote( int64_t staked ) {
    //    /// TODO subtract 2080 brings the large numbers closer to this decade
