@@ -176,7 +176,7 @@ namespace eosiosystem {
 
 
    typedef eosio::multi_index< N(producers), producer_info,
-                               indexed_by<N(prototalvote), const_mem_fun<producer_info, int64_t, &producer_info::by_votes>  >
+                               indexed_by<N(prototalvote), const_mem_fun<producer_info, int32_t, &producer_info::by_votes>  >
                                >  producers_table;
 
    typedef eosio::singleton<N(global), eosio_global_state> global_state_singleton;
