@@ -94,31 +94,31 @@ namespace eosiosystem {
       double   by_votes()const    { return is_active ? -total_votes : total_votes;  }
       bool     active()const      { return is_active;                               }
       void     deactivate()       { producer_key = public_key(); is_active = false; }
-      // void     set_vote_weight(int64_t vote)  {
-      //    int64_t vote_date = ((now() - (block_timestamp::block_timestamp_epoch / 1000)) / 24 * 3600); 
-      //    int64_t idx = vote_date % 30; // idx => 0 ~ 29
-      //    vote_weight_window_date[idx] = vote_date;
-      //    if(idx != privIdx){
-      //       if(privIdx != 31) {
-      //          int priv = privIdx;
-      //          while(priv != idx){
-      //             vote_window_state |= (1 << priv);
-      //             priv = (priv + 1) % 30;
-      //          }
-      //       }
-      //    }
-      //    if(!(vote_window_state & (1 << idx))){ //PENDING state
-      //       vote_weight_window[idx] += vote;
-      //       total_votes += vote;
-      //    }
-      //    else{                                  //CLOSED state
-      //       total_votes -= vote_weight_window[idx];
-      //       vote_window_state &= ~(1 << idx);
-      //       vote_weight_window[idx] = vote;
-      //       total_votes += vote_weight_window[idx];
-      //    }
-      //    privIdx = idx;
-      // }
+      void     set_vote_weight(int64_t vote)  {
+         int64_t vote_date = ((now() - (block_timestamp::block_timestamp_epoch / 1000)) / 24 * 3600); 
+         int64_t idx = vote_date % 30; // idx => 0 ~ 29
+         vote_weight_window_date[idx] = vote_date;
+         if(idx != privIdx){
+            if(privIdx != 31) {
+               int priv = privIdx;
+               while(priv != idx){
+                  vote_window_state |= (1 << priv);
+                  priv = (priv + 1) % 30;
+               }
+            }
+         }
+         if(!(vote_window_state & (1 << idx))){ //PENDING state
+            vote_weight_window[idx] += vote;
+            total_votes += vote;
+         }
+         else{                                  //CLOSED state
+            total_votes -= vote_weight_window[idx];
+            vote_window_state &= ~(1 << idx);
+            vote_weight_window[idx] = vote;
+            total_votes += vote_weight_window[idx];
+         }
+         privIdx = idx;
+      }
       // void     set_vote_weight(int64_t vote)  {
       //    std::pair<std::map<uint64_t, int64_t>::iterator, bool> ret;
       //    uint64_t idx = ((now() - (block_timestamp::block_timestamp_epoch / 1000)) / 24 * 3600);
@@ -268,8 +268,8 @@ namespace eosiosystem {
          // void voteproducer( const account_name voter_name, const account_name target_producer, asset quantity );
 
          //beStage 2
-         // void voteproducer( const account_name voter_name, const asset quantity, const std::vector<account_name>& producers );
-         void voteproducer( const account_name voter_name, const std::vector<account_name>& producers );
+         void voteproducer( const account_name voter_name, const asset quantity, const std::vector<account_name>& producers );
+         // void voteproducer( const account_name voter_name, const std::vector<account_name>& producers );
 
          void regproxy( const account_name proxy, bool isproxy );
 
@@ -304,8 +304,8 @@ namespace eosiosystem {
          // void update_votes( const account_name burner, const account_name target_producer, asset quantity );
 
          //beStage 2
-         // void update_votes( const account_name burner, const asset quantity, const std::vector<account_name>& producers );
-         void update_votes( const account_name burner, const std::vector<account_name>& producers );
+         void update_votes( const account_name burner, const asset quantity, const std::vector<account_name>& producers );
+         // void update_votes( const account_name burner, const std::vector<account_name>& producers );
    };
 
 } /// eosiosystem

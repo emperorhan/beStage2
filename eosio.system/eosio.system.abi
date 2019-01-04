@@ -269,6 +269,7 @@
          {"name":"vote_weight_window_date", "type":"int64[]"},
          {"name":"vote_window_state",       "type":"uint32"},
          {"name":"privIdx",                 "type":"int32"},
+         {"name":"total_votes",             "type":"int64"},
          {"name":"producer_key",            "type":"public_key"},
          {"name":"is_active",               "type":"bool"},
          {"name":"url",                     "type":"string"},
@@ -302,6 +303,7 @@
       "base": "",
       "fields": [
         {"name":"voter_name", "type":"account_name"},
+        {"name":"quantity",   "type":"asset"},
         {"name":"producers",  "type":"account_name[]"}
       ]
     },{
