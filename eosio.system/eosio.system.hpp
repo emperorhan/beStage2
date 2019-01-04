@@ -91,7 +91,7 @@ namespace eosiosystem {
          return ret;
       }
       // int64_t   by_votes()const    { return is_active ? -get_vote_weight() : get_vote_weight();  }
-      int64_t   by_votes()const    { return is_active ? -total_votes : total_votes;  }
+      double   by_votes()const    { return is_active ? -total_votes : total_votes;  }
       bool     active()const      { return is_active;                               }
       void     deactivate()       { producer_key = public_key(); is_active = false; }
       void     set_vote_weight(int64_t vote)  {
@@ -137,6 +137,7 @@ namespace eosiosystem {
       // explicit serialization macro is not necessary, used here only to improve compilation time
       // EOSLIB_SERIALIZE( producer_info, (owner)(vote_weight_window)(vote_weight_window_date)(vote_window_state)(privIdx)(producer_key)(is_active)(url)
       //                   (unpaid_blocks)(last_claim_time)(location) )
+
       EOSLIB_SERIALIZE( producer_info, (owner)(vote_weight_window)(vote_weight_window_date)(vote_window_state)(privIdx)(total_votes)(producer_key)(is_active)(url)
                         (unpaid_blocks)(last_claim_time)(location) )
    };
