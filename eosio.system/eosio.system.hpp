@@ -90,7 +90,7 @@ namespace eosiosystem {
          }
          return ret;
       }
-      int64_t   by_votes()const    { return is_active ? -get_vote_weight() : get_vote_weight();  }
+      double   by_votes()    { return is_active ? -get_vote_weight() : get_vote_weight();  }
       // double   by_votes()const    { return is_active ? -total_votes : total_votes;  }
       bool     active()const      { return is_active;                               }
       void     deactivate()       { producer_key = public_key(); is_active = false; }
