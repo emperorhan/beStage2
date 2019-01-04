@@ -14,6 +14,12 @@
 // #include <iostream>
 
 #include <string>
+#include <vector>
+
+enum WINDOW_STATE{
+   PENDING,
+   CLOSED
+}
 
 namespace eosiosystem {
 
@@ -65,7 +71,10 @@ namespace eosiosystem {
 
    struct producer_info {
       account_name                  owner;
-      std::map<uint64_t, int64_t>   vote_weight_window;
+      // std::map<uint64_t, int64_t>   vote_weight_window;
+      std::vector<int64_t>          vote_weight_window(30);
+      uint32_t                      vote_window_state = 0;
+      int32_t                       privIdx = 31;
       int64_t                       total_votes = 0;
       eosio::public_key             producer_key; /// a packed public key object
       bool                          is_active = true;
@@ -79,18 +88,37 @@ namespace eosiosystem {
       bool     active()const      { return is_active;                               }
       void     deactivate()       { producer_key = public_key(); is_active = false; }
       void     set_vote_weight(int64_t vote)  {
-         std::pair<std::map<uint64_t, int64_t>::iterator, bool> ret;
-         uint64_t idx = ((now() - (block_timestamp::block_timestamp_epoch / 1000)) / 24 * 3600);
-
-         ret = vote_weight_window.insert({idx, vote});
-         if(ret.second == false) vote_weight_window.at(idx) += vote;
-         total_votes += vote;
-
-         if(vote_weight_window.size() == 31){
-            total_votes -= vote_weight_window.at(idx - 30);
-            vote_weight_window.erase(idx - 30);
+         int32_t idx = ((now() - (block_timestamp::block_timestamp_epoch / 1000)) / 24 * 3600) % 30; // idx => 0 ~ 29
+         if(idx != privIdx){
+            vote_window_state |= (1 << privIdx);
+            privIdx = idx;
+         }
+         if(!(vote_window_state & (1 << idx))){ //PENDING state
+            vote_weight_window[idx] += vote;
+            total_votes += vote;
+         }
+         else{                                  //CLOSED state
+            total_votes - vote_weight_window[idx];
+            vote_window_state &= ~(1 << idx);
+            vote_weight_window[idx] = vote;
+            total_votes += vote_weight_window[idx];
          }
       }
+      // void     set_vote_weight(int64_t vote)  {
+      //    std::pair<std::map<uint64_t, int64_t>::iterator, bool> ret;
+      //    uint64_t idx = ((now() - (block_timestamp::block_timestamp_epoch / 1000)) / 24 * 3600);
+
+      //    ret = vote_weight_window.insert({idx, vote});
+      //    if(ret.second == false) vote_weight_window.at(idx) += vote;
+      //    total_votes += vote;
+
+      //    std::map<uint64_t, int64_t>::iterator it;
+      //    it = vote_weight_window.find(idx - 30)
+      //    if(it != vote_weight_window.end()){
+      //       total_votes -= vote_weight_window.at(idx - 30);
+      //       vote_weight_window.erase(idx - 30);
+      //    }
+      // }
       // explicit serialization macro is not necessary, used here only to improve compilation time
       EOSLIB_SERIALIZE( producer_info, (owner)(vote_weight_window)(total_votes)(producer_key)(is_active)(url)
                         (unpaid_blocks)(last_claim_time)(location) )
