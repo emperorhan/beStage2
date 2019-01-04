@@ -81,7 +81,7 @@ namespace eosiosystem {
       uint16_t                      location = 0;
 
       uint64_t primary_key()const { return owner;                                   }
-      int64_t  get_vote_weight()const {
+      int64_t  get_vote_weight() {
          int64_t ret = 0;
          int64_t vote_date = ((now() - (block_timestamp::block_timestamp_epoch / 1000)) / 24 * 3600); 
          for(int idx = 0; idx < 30; idx++){
