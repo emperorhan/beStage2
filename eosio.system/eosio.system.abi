@@ -265,8 +265,8 @@
       "base": "",
       "fields": [
          {"name":"owner",                   "type":"account_name"},
-         {"name":"vote_weight_window",      "type":"[]"},
-         {"name":"vote_weight_window_date", "type":"[]"},
+         {"name":"vote_weight_window",      "type":"int64[]"},
+         {"name":"vote_weight_window_date", "type":"int64[]"},
          {"name":"vote_window_state",       "type":"uint32_t"},
          {"name":"privIdx",                 "type":"int32_t"},
          {"name":"producer_key",            "type":"public_key"},
