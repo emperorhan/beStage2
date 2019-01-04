@@ -16,10 +16,6 @@
 #include <string>
 #include <vector>
 
-enum WINDOW_STATE{
-   PENDING,
-   CLOSED
-}
 
 namespace eosiosystem {
 
@@ -72,8 +68,8 @@ namespace eosiosystem {
    struct producer_info {
       account_name                  owner;
       // std::map<uint64_t, int64_t>   vote_weight_window;
-      std::vector<int64_t>          vote_weight_window (30);
-      std::vector<int64_t>          vote_weight_window_date (30);
+      int64_t                       vote_weight_window[30];
+      int64_t                       vote_weight_window_date[30];
       uint32_t                      vote_window_state = 0;
       int32_t                       privIdx = 31;
       // int64_t                       total_votes = 0;
