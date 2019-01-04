@@ -76,7 +76,6 @@ namespace eosiosystem {
       std::vector<int64_t>          vote_weight_window_date (30);
       uint32_t                      vote_window_state = 0;
       int32_t                       privIdx = 31;
-      int64_t                       last_vote_date;
       // int64_t                       total_votes = 0;
       eosio::public_key             producer_key; /// a packed public key object
       bool                          is_active = true;
@@ -87,14 +86,20 @@ namespace eosiosystem {
 
       uint64_t primary_key()const { return owner;                                   }
       int64_t  get_vote_weight()const {
-         
+         int64_t ret = 0;
+         int64_t vote_date = ((now() - (block_timestamp::block_timestamp_epoch / 1000)) / 24 * 3600); 
+         for(int idx = 0; idx < 30; idx++){
+            if(vote_weight_window_date[idx] > vote_date - 30) ret += vote_weight_window[idx];
+            else vote_weight_window[idx] = 0;
+         }
+         return ret;
       }
       int64_t   by_votes()const    { return is_active ? -get_vote_weight() : get_vote_weight();  }
       // int64_t   by_votes()const    { return is_active ? -total_votes : total_votes;  }
       bool     active()const      { return is_active;                               }
       void     deactivate()       { producer_key = public_key(); is_active = false; }
       void     set_vote_weight(int64_t vote)  {
-         last_vote_date = ((now() - (block_timestamp::block_timestamp_epoch / 1000)) / 24 * 3600); 
+         int64_t vote_date = ((now() - (block_timestamp::block_timestamp_epoch / 1000)) / 24 * 3600); 
          int64_t idx = vote_date % 30; // idx => 0 ~ 29
          vote_weight_window_date[idx] = vote_date;
          if(idx != privIdx){
@@ -111,10 +116,10 @@ namespace eosiosystem {
             // total_votes += vote;
          }
          else{                                  //CLOSED state
-            // total_votes - vote_weight_window[idx];
+            // total_votes -= vote_weight_window[idx];
             vote_window_state &= ~(1 << idx);
             vote_weight_window[idx] = vote;
-            total_votes += vote_weight_window[idx];
+            // total_votes += vote_weight_window[idx];
          }
          privIdx = idx;
       }
@@ -134,7 +139,7 @@ namespace eosiosystem {
       //    }
       // }
       // explicit serialization macro is not necessary, used here only to improve compilation time
-      EOSLIB_SERIALIZE( producer_info, (owner)(vote_weight_window)(total_votes)(producer_key)(is_active)(url)
+      EOSLIB_SERIALIZE( producer_info, (owner)(vote_weight_window)(vote_weight_window_date)(vote_window_state)(privIdx)(producer_key)(is_active)(url)
                         (unpaid_blocks)(last_claim_time)(location) )
    };
 
