@@ -186,7 +186,7 @@ namespace eosiosystem {
       eosio_assert( quantity.symbol == symbol_type(system_token_symbol), "this token is not system token" );
       eosio_assert( quantity.amount > 0, "must burn positive quantity" );
 
-      int64_t vote_weight = quantity.amount;
+      int64_t vote_weight = quantity.amount / producers.size();
 
       auto burner_name = name{burner};
       std::string quantity_string = asset_to_string(quantity);
@@ -199,7 +199,6 @@ namespace eosiosystem {
             _producers.modify( pitr, 0, [&]( auto& p ) {
                eosio_assert( p.active(), "producer is not currently registered" );
                p.set_vote_weight(vote_weight);
-               // p.total_votes += vote_weight;
                // TODO: 30days가 지나면 _gstate의 total_producer_vote_weight도 감소시켜줘야함.
                _gstate.total_producer_vote_weight += vote_weight;
             });

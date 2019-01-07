@@ -54,7 +54,7 @@ namespace eosiosystem {
       int64_t              total_activated_stake = 0;
       uint64_t             thresh_activated_stake_time = 0;
       uint16_t             last_producer_schedule_size = 0;
-      int64_t              total_producer_vote_weight = 0; /// the sum of all producer votes
+      double               total_producer_vote_weight = 0; /// the sum of all producer votes
       block_timestamp      last_name_close;
 
       // explicit serialization macro is not necessary, used here only to improve compilation time
@@ -68,11 +68,11 @@ namespace eosiosystem {
    struct producer_info {
       account_name                  owner;
       // std::map<uint64_t, int64_t>   vote_weight_window;
-      int64_t                       vote_weight_window[30];
+      double                        vote_weight_window[30];
       int64_t                       vote_weight_window_date[30];
       uint32_t                      vote_window_state = 0;
       int32_t                       privIdx = 31;
-      int64_t                       total_votes = 0;
+      double                        total_votes = 0;
       eosio::public_key             producer_key; /// a packed public key object
       bool                          is_active = true;
       std::string                   url;
