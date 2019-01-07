@@ -47,6 +47,7 @@ namespace eosiosystem {
       int64_t              total_ram_stake = 0;
 
       block_timestamp      last_producer_schedule_update;
+      block_timestamp      last_producer_vote_table_update;
       uint64_t             last_pervote_bucket_fill = 0;
       int64_t              pervote_bucket = 0;
       int64_t              perblock_bucket = 0;
@@ -73,6 +74,7 @@ namespace eosiosystem {
       uint32_t                      vote_window_state = 0;
       int32_t                       privIdx = 31;
       double                        total_votes = 0;
+      double                        decrease_vote_weight = 0;
       eosio::public_key             producer_key; /// a packed public key object
       bool                          is_active = true;
       std::string                   url;
@@ -112,6 +114,7 @@ namespace eosiosystem {
             total_votes += vote;
          }
          else{                                  //CLOSED state
+            decrease_vote_weight += vote_weight_window[idx];
             total_votes -= vote_weight_window[idx];
             vote_window_state &= ~(1 << idx);
             vote_weight_window[idx] = vote;

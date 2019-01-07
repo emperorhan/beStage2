@@ -73,6 +73,22 @@ namespace eosiosystem {
    void system_contract::update_elected_producers( block_timestamp block_time ) {
       _gstate.last_producer_schedule_update = block_time;
 
+      if ((block_time.slot - _gstate.last_producer_vote_table_update.slot) > blocks_per_day){
+         _gstate.last_producer_vote_table_update = block_time;
+         
+         for(auto& p : _producers){
+            _producers.modify( p, 0, [&]( producer_info& info ){
+               info.set_vote_weight(0);
+            });
+            if(p.decrease_vote_weight){
+               _gstate.total_producer_vote_weight -= p.decrease_vote_weight;
+               _producers.modify( p, 0, [&]( producer_info& info ){
+                  p.decrease_vote_weight = 0;
+               });
+            }
+         }
+      }
+
       auto idx = _producers.get_index<N(prototalvote)>();
 
       std::vector< std::pair<eosio::producer_key,uint16_t> > top_producers;
