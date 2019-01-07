@@ -83,7 +83,7 @@ namespace eosiosystem {
             if(p.decrease_vote_weight){
                _gstate.total_producer_vote_weight -= p.decrease_vote_weight;
                _producers.modify( p, 0, [&]( producer_info& info ){
-                  p.decrease_vote_weight = 0;
+                  info.decrease_vote_weight = 0;
                });
             }
          }
