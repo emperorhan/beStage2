@@ -215,7 +215,6 @@ namespace eosiosystem {
             _producers.modify( pitr, 0, [&]( auto& p ) {
                eosio_assert( p.active(), "producer is not currently registered" );
                p.set_vote_weight(vote_weight);
-               // TODO: 30days가 지나면 _gstate의 total_producer_vote_weight도 감소시켜줘야함.
                _gstate.total_producer_vote_weight += vote_weight;
             });
          }
