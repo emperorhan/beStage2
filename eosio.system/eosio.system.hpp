@@ -96,7 +96,7 @@ namespace eosiosystem {
       double   by_votes()const    { return is_active ? -total_votes : total_votes;  }
       bool     active()const      { return is_active;                               }
       void     deactivate()       { producer_key = public_key(); is_active = false; }
-      void     set_vote_weight(int64_t vote)  {
+      void     set_vote_weight(double vote)  {
          int64_t vote_date = ((now() - (block_timestamp::block_timestamp_epoch / 1000)) / (24 * 3600)); 
          int64_t idx = vote_date % 30; // idx => 0 ~ 29
          vote_weight_window_date[idx] = vote_date;
