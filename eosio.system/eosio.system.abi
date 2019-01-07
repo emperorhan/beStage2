@@ -270,6 +270,7 @@
          {"name":"vote_window_state",       "type":"uint32"},
          {"name":"privIdx",                 "type":"int32"},
          {"name":"total_votes",             "type":"float64"},
+         {"name":"decrease_vote_weight",    "type":"float64"},
          {"name":"producer_key",            "type":"public_key"},
          {"name":"is_active",               "type":"bool"},
          {"name":"url",                     "type":"string"},

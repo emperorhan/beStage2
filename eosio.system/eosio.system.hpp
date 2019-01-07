@@ -141,7 +141,7 @@ namespace eosiosystem {
       // EOSLIB_SERIALIZE( producer_info, (owner)(vote_weight_window)(vote_weight_window_date)(vote_window_state)(privIdx)(producer_key)(is_active)(url)
       //                   (unpaid_blocks)(last_claim_time)(location) )
 
-      EOSLIB_SERIALIZE( producer_info, (owner)(vote_weight_window)(vote_weight_window_date)(vote_window_state)(privIdx)(total_votes)(producer_key)(is_active)(url)
+      EOSLIB_SERIALIZE( producer_info, (owner)(vote_weight_window)(vote_weight_window_date)(vote_window_state)(privIdx)(total_votes)(decrease_vote_weight)(producer_key)(is_active)(url)
                         (unpaid_blocks)(last_claim_time)(location) )
    };
 
