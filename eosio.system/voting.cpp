@@ -202,7 +202,7 @@ namespace eosiosystem {
       eosio_assert( quantity.symbol == symbol_type(system_token_symbol), "this token is not system token" );
       eosio_assert( quantity.amount > 0, "must burn positive quantity" );
 
-      int64_t vote_weight = quantity.amount / producers.size();
+      double vote_weight = quantity.amount / producers.size();
 
       auto burner_name = name{burner};
       std::string quantity_string = asset_to_string(quantity);
